@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  graph-query:
+    container_name: graph-query
+    build:
+      context: ./services/graph-query
+      dockerfile: Dockerfile
+    volumes:
+        - ./data/s_t_e_wiki_sent_2.csv:/data/csv-data.csv
+    ports:
+        - 5000:5000
+    environment:
+        - PORT=5000
+        - DB=ws://gremlindb:8182/gremlin
+    networks:
+        - backend
+    depends_on:
+        - gremlindb
+
+  gremlindb:
+    container_name: gremlindb
+    image: tinkerpop/gremlin-server
+    ports:
+        - 8182:8182
+    volumes:
+        - ./conf/gremlin.server.custom.yml:/gremlin-console/conf/remote-docker-compose.yml
+    networks:
+        - backend
+    
+
+networks:
+    backend:
+        driver: bridge
